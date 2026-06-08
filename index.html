@@ -104,24 +104,19 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
-    <script src="loader.js"></script>
     <script>
-      (function waitForImoFlow() {
-        const appReady =
-          typeof saveData === "function" &&
-          typeof saveQuickTodos === "function" &&
-          typeof putStoredFile === "function" &&
-          typeof state !== "undefined";
-
-        if (!appReady) {
-          window.setTimeout(waitForImoFlow, 100);
-          return;
-        }
-
+      (async function startImoFlow() {
+        const response = await fetch("loader.js");
+        if (!response.ok) throw new Error("Não foi possível carregar o ImoFlow.");
+        await (0, eval)(await response.text());
         const cloudScript = document.createElement("script");
-        cloudScript.src = "cloud.js?v=2";
+        cloudScript.src = "cloud.js?v=3";
         document.body.appendChild(cloudScript);
-      })();
+      })().catch(error => {
+        console.error(error);
+        document.getElementById("mainContent").innerHTML =
+          '<div class="empty-state">Não foi possível iniciar o ImoFlow neste navegador.</div>';
+      });
     </script>
   </body>
 </html>

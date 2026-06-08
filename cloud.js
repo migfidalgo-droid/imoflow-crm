@@ -9,6 +9,7 @@
   let cloudWriteInFlight = false;
   let cloudLastUpdatedAt = "";
   let cloudSubscription = null;
+  let cloudSessionStartedFor = "";
 
   const localSaveData = saveData;
   const localSaveQuickTodos = saveQuickTodos;
@@ -88,7 +89,11 @@
     if (!email || !password) return;
     cloudSetAuthMessage(action === "signup" ? "A criar conta..." : "A entrar...");
     const result = action === "signup"
-      ? await cloudClient.auth.signUp({ email, password })
+      ? await cloudClient.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: `${window.location.origin}${window.location.pathname}` },
+      })
       : await cloudClient.auth.signInWithPassword({ email, password });
     if (result.error) {
       cloudSetAuthMessage(result.error.message, true);
@@ -148,6 +153,8 @@
 
   async function cloudStartSession(session) {
     if (!session?.user) return;
+    if (cloudSessionStartedFor === session.user.id) return;
+    cloudSessionStartedFor = session.user.id;
     cloudUser = session.user;
     cloudSetSignedInInterface(session);
     cloudSetSync("A sincronizar...", "is-syncing");
@@ -295,6 +302,12 @@
       cloudSetAuthMessage("A ligação à base de dados ainda não está configurada.", true);
       return;
     }
+    cloudClient.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session?.user) {
+        cloudSetAuthMessage("E-mail confirmado. A abrir o ImoFlow...");
+        window.setTimeout(() => cloudStartSession(session), 0);
+      }
+    });
     const { data, error } = await cloudClient.auth.getSession();
     if (error) {
       cloudSetAuthMessage("Não foi possível validar a sessão.", true);

@@ -1,15 +1,16 @@
 (() => {
   const navigation = document.getElementById("navList");
   if (!navigation) return;
-  const pendingViewKey = "imoflow-pending-view";
 
-  const pendingView = sessionStorage.getItem(pendingViewKey);
+  const pendingView = new URLSearchParams(window.location.search).get("imoflowView");
   if (pendingView) {
     const openPendingView = window.setInterval(() => {
       const button = navigation.querySelector(`[data-view="${pendingView}"]`);
       if (!button || document.querySelector(".app-shell.is-auth-locked")) return;
       window.clearInterval(openPendingView);
-      sessionStorage.removeItem(pendingViewKey);
+      const cleanUrl = new URL(window.location.href);
+      cleanUrl.searchParams.delete("imoflowView");
+      window.history.replaceState({}, "", cleanUrl);
       button.click();
     }, 150);
     window.setTimeout(() => window.clearInterval(openPendingView), 10000);
@@ -21,7 +22,8 @@
 
     event.preventDefault();
     event.stopImmediatePropagation();
-    sessionStorage.setItem(pendingViewKey, button.dataset.view);
-    window.location.reload();
+    const targetUrl = new URL(window.location.href);
+    targetUrl.searchParams.set("imoflowView", button.dataset.view);
+    window.location.href = targetUrl;
   }, { capture: true });
 })();

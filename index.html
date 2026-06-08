@@ -15,7 +15,6 @@
             <span>CRM Imobiliária</span>
           </div>
         </div>
-
         <nav class="nav-list" id="navList">
           <button class="nav-item is-active" data-view="dashboard" type="button">Painel principal</button>
           <button class="nav-item" data-view="contacts" type="button">Contactos</button>
@@ -27,95 +26,36 @@
           <button class="nav-item" data-view="reports" type="button">Relatórios</button>
           <button class="nav-item" data-view="portal" type="button">Portal cliente</button>
         </nav>
-
-        <div class="sidebar-footer">
-          <span class="status-dot"></span>
-          <span>Dados locais</span>
-        </div>
+        <div class="sidebar-footer"><span class="status-dot"></span><span>Dados locais</span></div>
       </aside>
-
       <main class="main">
         <header class="topbar">
-          <div>
-            <p class="eyebrow">Fase 1</p>
-            <h1 id="pageTitle">Painel</h1>
-          </div>
+          <div><p class="eyebrow">Fase 1</p><h1 id="pageTitle">Painel</h1></div>
           <div class="topbar-actions">
-            <label class="search-field" for="globalSearch">
-              <span>Pesquisar</span>
-              <input id="globalSearch" type="search" placeholder="Nome, telefone, referência...">
-            </label>
-            <button class="icon-button" id="exportDataBtn" type="button" title="Exportar dados" aria-label="Exportar dados">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 3v12"></path>
-                <path d="m7 10 5 5 5-5"></path>
-                <path d="M5 21h14"></path>
-              </svg>
-            </button>
-            <button class="icon-button" id="importDataBtn" type="button" title="Importar dados" aria-label="Importar dados">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 21V9"></path>
-                <path d="m7 14 5-5 5 5"></path>
-                <path d="M5 3h14"></path>
-              </svg>
-            </button>
-            <button class="primary-button" id="quickAddBtn" type="button">Novo</button>
-            <input id="importFileInput" type="file" accept="application/json" hidden>
+            <label class="search-field" for="globalSearch"><span>Pesquisar</span><input id="globalSearch" type="search" placeholder="Nome, telefone, referência..."></label>
+            <button class="icon-button" id="exportDataBtn" type="button" title="Exportar dados" aria-label="Exportar dados"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path></svg></button>
+            <button class="icon-button" id="importDataBtn" type="button" title="Importar dados" aria-label="Importar dados"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21V9"></path><path d="m7 14 5-5 5 5"></path><path d="M5 3h14"></path></svg></button>
+            <button class="primary-button" id="quickAddBtn" type="button">Novo</button><input id="importFileInput" type="file" accept="application/json" hidden>
           </div>
         </header>
-
         <section class="content" id="mainContent" aria-live="polite"></section>
       </main>
     </div>
-
-    <div class="modal" id="entityModal" aria-hidden="true">
-      <div class="modal-backdrop" data-close-modal></div>
-      <section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-        <header class="modal-header">
-          <div>
-            <p class="eyebrow" id="modalEyebrow">Registo</p>
-            <h2 id="modalTitle">Novo registo</h2>
-          </div>
-          <button class="icon-button" data-close-modal type="button" aria-label="Fechar">x</button>
-        </header>
-        <form id="entityForm" class="form-grid"></form>
-      </section>
-    </div>
-
-    <div class="document-viewer" id="documentViewer" aria-hidden="true">
-      <div class="document-viewer-backdrop" data-close-document-viewer></div>
-      <section class="document-viewer-panel" role="dialog" aria-modal="true" aria-labelledby="documentViewerTitle">
-        <header class="document-viewer-header">
-          <div>
-            <p class="eyebrow">Documento</p>
-            <h2 id="documentViewerTitle">Visualizar documento</h2>
-          </div>
-          <div class="document-viewer-actions">
-            <a class="secondary-button" id="documentViewerOpen" href="#" target="_blank" rel="noopener">Abrir em nova janela</a>
-            <a class="secondary-button" id="documentViewerDownload" href="#" download>Descarregar</a>
-            <button class="icon-button" data-close-document-viewer type="button" aria-label="Fechar">x</button>
-          </div>
-        </header>
-        <div class="document-viewer-body" id="documentViewerBody"></div>
-      </section>
-    </div>
-
+    <div class="modal" id="entityModal" aria-hidden="true"><div class="modal-backdrop" data-close-modal></div><section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><header class="modal-header"><div><p class="eyebrow" id="modalEyebrow">Registo</p><h2 id="modalTitle">Novo registo</h2></div><button class="icon-button" data-close-modal type="button" aria-label="Fechar">x</button></header><form id="entityForm" class="form-grid"></form></section></div>
+    <div class="document-viewer" id="documentViewer" aria-hidden="true"><div class="document-viewer-backdrop" data-close-document-viewer></div><section class="document-viewer-panel" role="dialog" aria-modal="true" aria-labelledby="documentViewerTitle"><header class="document-viewer-header"><div><p class="eyebrow">Documento</p><h2 id="documentViewerTitle">Visualizar documento</h2></div><div class="document-viewer-actions"><a class="secondary-button" id="documentViewerOpen" href="#" target="_blank" rel="noopener">Abrir em nova janela</a><a class="secondary-button" id="documentViewerDownload" href="#" download>Descarregar</a><button class="icon-button" data-close-document-viewer type="button" aria-label="Fechar">x</button></div></header><div class="document-viewer-body" id="documentViewerBody"></div></section></div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script>
     <script>
       (async function startImoFlow() {
         const response = await fetch("loader.js");
         if (!response.ok) throw new Error("Não foi possível carregar o ImoFlow.");
         await (0, eval)(await response.text());
         const cloudScript = document.createElement("script");
-        cloudScript.src = "cloud.js?v=6";
+        cloudScript.src = "cloud.js?v=7";
         document.body.appendChild(cloudScript);
       })().catch(error => {
         console.error(error);
-        document.getElementById("mainContent").innerHTML =
-          '<div class="empty-state">Não foi possível iniciar o ImoFlow neste navegador.</div>';
+        document.getElementById("mainContent").innerHTML = '<div class="empty-state">Não foi possível iniciar o ImoFlow neste navegador.</div>';
       });
     </script>
   </body>

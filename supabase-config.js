@@ -1,0 +1,2 @@
+window.IMOFLOW_SUPABASE_URL = "https://rmadcturzoswyydiibey.supabase.co";
+window.IMOFLOW_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJtYWRjdHVyem9zd3l5ZGlpYmV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5MTEwNDksImV4cCI6MjA5NjQ4NzA0OX0.7gRVN5L22FADqrDx6DAb9drAgDPliY1yfxix1aITaHs";

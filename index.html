@@ -110,7 +110,7 @@
         if (!response.ok) throw new Error("Não foi possível carregar o ImoFlow.");
         await (0, eval)(await response.text());
         const cloudScript = document.createElement("script");
-        cloudScript.src = "cloud.js?v=3";
+        cloudScript.src = "cloud.js?v=4";
         document.body.appendChild(cloudScript);
       })().catch(error => {
         console.error(error);

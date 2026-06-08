@@ -105,6 +105,23 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="loader.js"></script>
-    <script src="cloud.js"></script>
+    <script>
+      (function waitForImoFlow() {
+        const appReady =
+          typeof saveData === "function" &&
+          typeof saveQuickTodos === "function" &&
+          typeof putStoredFile === "function" &&
+          typeof state !== "undefined";
+
+        if (!appReady) {
+          window.setTimeout(waitForImoFlow, 100);
+          return;
+        }
+
+        const cloudScript = document.createElement("script");
+        cloudScript.src = "cloud.js?v=2";
+        document.body.appendChild(cloudScript);
+      })();
+    </script>
   </body>
 </html>

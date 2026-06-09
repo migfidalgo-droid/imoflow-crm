@@ -13,7 +13,16 @@
 
       event.preventDefault();
       event.stopImmediatePropagation();
-      window.imoflowSetView(button.dataset.view);
+      navigation.dataset.lastRequestedView = button.dataset.view;
+      try {
+        window.imoflowSetView(button.dataset.view);
+        navigation.dataset.lastNavigationResult = "called";
+      } catch (error) {
+        navigation.dataset.lastNavigationResult = error?.message || "error";
+      }
+      window.setTimeout(() => {
+        navigation.dataset.lastNavigationTitle = document.getElementById("pageTitle")?.textContent || "";
+      }, 100);
     }, { capture: true });
     return true;
   };

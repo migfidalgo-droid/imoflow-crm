@@ -25,14 +25,21 @@ jobs:
           loader = path.read_text()
           payload_pattern = re.compile(r'(?P<prefix>\(0, eval\)\(await imoflowInflate\(")(?P<data>[^"]+)(?P<suffix>"\)\);)')
           set_view_pattern = re.compile(r'(function setView\(view\) \{\s*state\.view = view;\s*render\(\);\s*\})')
+          old_bridge = "window.imoflowBaseSetView = setView;"
+          new_bridge = "window.imoflowBaseSetView = view => { state.view = view; render(); };"
           patched = 0
 
           def update_payload(match):
               global patched
               source = gzip.decompress(base64.b64decode(match.group("data"))).decode("utf-8")
-              if "window.imoflowBaseSetView = setView;" in source or not set_view_pattern.search(source):
+              if new_bridge in source:
                   return match.group(0)
-              source = set_view_pattern.sub(r'\1\n\nwindow.imoflowBaseSetView = setView;', source, count=1)
+              if old_bridge in source:
+                  source = source.replace(old_bridge, new_bridge, 1)
+              elif set_view_pattern.search(source):
+                  source = set_view_pattern.sub(r'\1\n\n' + new_bridge, source, count=1)
+              else:
+                  return match.group(0)
               payload = base64.b64encode(gzip.compress(source.encode("utf-8"), mtime=0)).decode("ascii")
               patched += 1
               return match.group("prefix") + payload + match.group("suffix")
@@ -48,7 +55,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add loader.js
-          git commit -m "Expose internal navigation controller"
+          git commit -m "Preserve state in navigation controller"
           git push
 
-# One-time trigger: navigation bridge
+# One-time trigger: stateful navigation bridge

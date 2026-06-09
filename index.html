@@ -132,7 +132,7 @@
           return false;
         };
 
-        const response = await fetch("loader.js?v=8");
+        const response = await fetch("loader.js?v=9");
         if (!response.ok) throw new Error("Não foi possível carregar o ImoFlow.");
         await (0, eval)(await response.text());
         window.els = {
@@ -143,12 +143,6 @@
           exportDataBtn: document.getElementById("exportDataBtn"),
           importDataBtn: document.getElementById("importDataBtn"),
         };
-        const cloudScript = document.createElement("script");
-        cloudScript.src = "cloud.js?v=11";
-        document.body.appendChild(cloudScript);
-        const navigationScript = document.createElement("script");
-        navigationScript.src = "cloud-navigation.js?v=5";
-        document.body.appendChild(navigationScript);
       })().catch(error => {
         console.error(error);
         document.getElementById("mainContent").innerHTML =

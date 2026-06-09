@@ -106,16 +106,22 @@
     <script src="supabase-config.js"></script>
     <script>
       (async function startImoFlow() {
-        const response = await fetch("loader.js?v=3");
+        const response = await fetch("loader.js?v=4");
         if (!response.ok) throw new Error("Não foi possível carregar o ImoFlow.");
-        let applicationPayloadLoaded = false;
-        const loaderSource = (await response.text()).split("\n").filter(line => {
-          if (!line.includes("(0, eval)(await imoflowInflate(")) return true;
-          if (applicationPayloadLoaded) return false;
-          applicationPayloadLoaded = true;
-          return true;
-        }).join("\n");
-        await (0, eval)(loaderSource);
+        const nativeAddEventListener = EventTarget.prototype.addEventListener;
+        let navigationClickHandlers = 0;
+        EventTarget.prototype.addEventListener = function(type, listener, options) {
+          if (this?.id === "navList" && type === "click") {
+            navigationClickHandlers += 1;
+            if (navigationClickHandlers > 1) return;
+          }
+          return nativeAddEventListener.call(this, type, listener, options);
+        };
+        try {
+          await (0, eval)(await response.text());
+        } finally {
+          EventTarget.prototype.addEventListener = nativeAddEventListener;
+        }
         window.els = {
           pageTitle: document.getElementById("pageTitle"),
           mainContent: document.getElementById("mainContent"),

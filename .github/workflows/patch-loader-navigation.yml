@@ -50,3 +50,5 @@ jobs:
           git add loader.js
           git commit -m "Expose internal navigation controller"
           git push
+
+# One-time trigger: navigation bridge

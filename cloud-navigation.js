@@ -7,7 +7,8 @@
     if (navigation.dataset.cloudNavigationBound === "true") return true;
 
     navigation.dataset.cloudNavigationBound = "true";
-    navigation.addEventListener("click", event => {
+    const addEventListener = window.imoflowNativeAddNavigation || EventTarget.prototype.addEventListener;
+    addEventListener.call(navigation, "click", event => {
       const button = event.target.closest("[data-view]");
       if (!button || button.dataset.view === "users") return;
 
@@ -15,8 +16,10 @@
       event.stopImmediatePropagation();
       navigation.dataset.lastRequestedView = button.dataset.view;
       try {
-        window.imoflowSetView(button.dataset.view);
-        navigation.dataset.lastNavigationResult = "called";
+        const opened = typeof window.imoflowBaseNavigate === "function"
+          && window.imoflowBaseNavigate(button.dataset.view);
+        if (!opened) window.imoflowSetView(button.dataset.view);
+        navigation.dataset.lastNavigationResult = opened ? "base" : "bridge";
       } catch (error) {
         navigation.dataset.lastNavigationResult = error?.message || "error";
       }

@@ -31,10 +31,12 @@ jobs:
 
           runtime = '  eval(await (await fetch("cloud.js?v=12")).text());\n  eval(await (await fetch("cloud-navigation.js?v=6")).text());\n'
           if runtime not in loader:
-              closing = '})();'
-              position = loader.rfind(closing)
-              if position < 0:
-                  raise SystemExit("Could not locate loader runtime closing")
+              application_call = 'eval(await imoflowInflate("'
+              start = loader.rfind(application_call)
+              end = loader.find('"));', start)
+              if start < 0 or end < 0:
+                  raise SystemExit("Could not locate application payload call")
+              position = end + len('"));')
               loader = loader[:position] + '\n' + runtime + loader[position:]
               changes += 1
 
@@ -52,4 +54,4 @@ jobs:
           git commit -m "Install scoped access runtime"
           git push
 
-# One-time trigger: compact scoped runtime
+# One-time trigger: payload-scoped access runtime

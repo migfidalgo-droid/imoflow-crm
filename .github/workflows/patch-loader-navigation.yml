@@ -13,53 +13,43 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Preserve the application execution scope
+      - name: Load access control inside the application scope
         run: |
           python - <<'PY'
-          import base64
-          import gzip
-          import re
           from pathlib import Path
 
-          path = Path("loader.js")
-          loader = path.read_text()
-          payload_pattern = re.compile(r'(?P<prefix>\(0, eval\)\(await imoflowInflate\(")(?P<data>[^"]+)(?P<suffix>"\)\);)')
-          set_view_pattern = re.compile(r'(function setView\(view\) \{\s*state\.view = view;\s*render\(\);\s*\})')
-          old_bridge = "window.imoflowBaseSetView = setView;"
-          new_bridge = "window.imoflowBaseSetView = view => { state.view = view; render(); };"
-          payloads_patched = 0
+          loader_path = Path("loader.js")
+          cloud_path = Path("cloud.js")
+          loader = loader_path.read_text()
+          cloud = cloud_path.read_text()
+          changes = 0
 
-          def update_payload(match):
-              global payloads_patched
-              source = gzip.decompress(base64.b64decode(match.group("data"))).decode("utf-8")
-              if new_bridge in source:
-                  return match.group(0)
-              if old_bridge in source:
-                  source = source.replace(old_bridge, new_bridge, 1)
-              elif set_view_pattern.search(source):
-                  source = set_view_pattern.sub(r'\1\n\n' + new_bridge, source, count=1)
-              else:
-                  return match.group(0)
-              payload = base64.b64encode(gzip.compress(source.encode("utf-8"), mtime=0)).decode("ascii")
-              payloads_patched += 1
-              return match.group("prefix") + payload + match.group("suffix")
+          guard = '  if (typeof configureRemoteClient === "function") return;\n\n'
+          if guard in cloud:
+              cloud = cloud.replace(guard, "", 1)
+              changes += 1
 
-          updated = payload_pattern.sub(update_payload, loader)
-          indirect_eval = "(0, eval)(await imoflowInflate("
-          direct_eval = "eval(await imoflowInflate("
-          evals_patched = updated.count(indirect_eval)
-          updated = updated.replace(indirect_eval, direct_eval)
-          if payloads_patched == 0 and evals_patched == 0:
-              raise SystemExit("The loader was already patched")
-          path.write_text(updated)
-          print(f"Patched {payloads_patched} payload(s) and {evals_patched} evaluation call(s)")
+          runtime = '  eval(await (await fetch("cloud.js?v=12")).text());\n  eval(await (await fetch("cloud-navigation.js?v=6")).text());\n'
+          if runtime not in loader:
+              closing = '\n})();'
+              position = loader.rfind(closing)
+              if position < 0:
+                  raise SystemExit("Could not locate loader runtime closing")
+              loader = loader[:position] + '\n' + runtime + loader[position:]
+              changes += 1
+
+          if changes == 0:
+              raise SystemExit("The scoped runtime was already installed")
+          loader_path.write_text(loader)
+          cloud_path.write_text(cloud)
+          print(f"Applied {changes} scoped runtime change(s)")
           PY
-      - name: Commit patched loader
+      - name: Commit scoped runtime
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add loader.js
-          git commit -m "Preserve application state after loading"
+          git add loader.js cloud.js
+          git commit -m "Load access control inside application scope"
           git push
 
-# One-time trigger: preserve application scope
+# One-time trigger: scoped access runtime

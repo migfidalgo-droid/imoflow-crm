@@ -13,49 +13,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Capture navigation state references
+      - name: Load synchronized navigation runtime
         run: |
           python - <<'PY'
-          import base64
-          import gzip
-          import re
           from pathlib import Path
 
           path = Path("loader.js")
           loader = path.read_text()
-          payload_pattern = re.compile(r'(?P<prefix>eval\(await imoflowInflate\(")(?P<data>[^"]+)(?P<suffix>"\)\);)')
-          old_bridges = [
-              "window.imoflowBaseSetView = setView;",
-              "window.imoflowBaseSetView = view => { state.view = view; render(); };",
-          ]
-          captured_bridge = "window.imoflowBaseSetView = ((stateRef, renderRef) => view => { stateRef.view = view; renderRef(); })(state, render);"
-          patched = 0
-
-          def update_payload(match):
-              global patched
-              source = gzip.decompress(base64.b64decode(match.group("data"))).decode("utf-8")
-              if captured_bridge in source:
-                  return match.group(0)
-              for bridge in old_bridges:
-                  if bridge in source:
-                      source = source.replace(bridge, captured_bridge, 1)
-                      payload = base64.b64encode(gzip.compress(source.encode("utf-8"), mtime=0)).decode("ascii")
-                      patched += 1
-                      return match.group("prefix") + payload + match.group("suffix")
-              return match.group(0)
-
-          updated = payload_pattern.sub(update_payload, loader)
-          if patched == 0:
-              raise SystemExit("No navigation bridge was updated")
-          path.write_text(updated)
-          print(f"Captured state references in {patched} payload(s)")
+          old = 'cloud-navigation.js?v=6'
+          new = 'cloud-navigation.js?v=7'
+          if old not in loader:
+              raise SystemExit("Navigation runtime version was already updated")
+          path.write_text(loader.replace(old, new, 1))
           PY
-      - name: Commit captured bridge
+      - name: Commit runtime version
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add loader.js
-          git commit -m "Capture navigation state references"
+          git commit -m "Load synchronized navigation runtime"
           git push
 
-# One-time trigger: captured navigation references
+# One-time trigger: synchronized navigation runtime

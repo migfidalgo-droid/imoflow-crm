@@ -132,7 +132,7 @@
           return false;
         };
 
-        const response = await fetch("loader.js?v=5");
+        const response = await fetch("loader.js?v=6");
         if (!response.ok) throw new Error("Não foi possível carregar o ImoFlow.");
         await (0, eval)(await response.text());
         window.els = {
@@ -147,7 +147,7 @@
         cloudScript.src = "cloud.js?v=11";
         document.body.appendChild(cloudScript);
         const navigationScript = document.createElement("script");
-        navigationScript.src = "cloud-navigation.js?v=3";
+        navigationScript.src = "cloud-navigation.js?v=4";
         document.body.appendChild(navigationScript);
       })().catch(error => {
         console.error(error);

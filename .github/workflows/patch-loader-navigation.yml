@@ -13,45 +13,49 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Load access control inside the application scope
+      - name: Capture navigation state references
         run: |
           python - <<'PY'
+          import base64
+          import gzip
+          import re
           from pathlib import Path
 
-          loader_path = Path("loader.js")
-          cloud_path = Path("cloud.js")
-          loader = loader_path.read_text()
-          cloud = cloud_path.read_text()
-          changes = 0
+          path = Path("loader.js")
+          loader = path.read_text()
+          payload_pattern = re.compile(r'(?P<prefix>eval\(await imoflowInflate\(")(?P<data>[^"]+)(?P<suffix>"\)\);)')
+          old_bridges = [
+              "window.imoflowBaseSetView = setView;",
+              "window.imoflowBaseSetView = view => { state.view = view; render(); };",
+          ]
+          captured_bridge = "window.imoflowBaseSetView = ((stateRef, renderRef) => view => { stateRef.view = view; renderRef(); })(state, render);"
+          patched = 0
 
-          guard = '  if (typeof configureRemoteClient === "function") return;\n\n'
-          if guard in cloud:
-              cloud = cloud.replace(guard, "", 1)
-              changes += 1
+          def update_payload(match):
+              global patched
+              source = gzip.decompress(base64.b64decode(match.group("data"))).decode("utf-8")
+              if captured_bridge in source:
+                  return match.group(0)
+              for bridge in old_bridges:
+                  if bridge in source:
+                      source = source.replace(bridge, captured_bridge, 1)
+                      payload = base64.b64encode(gzip.compress(source.encode("utf-8"), mtime=0)).decode("ascii")
+                      patched += 1
+                      return match.group("prefix") + payload + match.group("suffix")
+              return match.group(0)
 
-          runtime = '  eval(await (await fetch("cloud.js?v=12")).text());\n  eval(await (await fetch("cloud-navigation.js?v=6")).text());\n'
-          if runtime not in loader:
-              application_call = 'eval(await imoflowInflate("'
-              start = loader.rfind(application_call)
-              end = loader.find('"));', start)
-              if start < 0 or end < 0:
-                  raise SystemExit("Could not locate application payload call")
-              position = end + len('"));')
-              loader = loader[:position] + '\n' + runtime + loader[position:]
-              changes += 1
-
-          if changes == 0:
-              raise SystemExit("The scoped runtime was already installed")
-          loader_path.write_text(loader)
-          cloud_path.write_text(cloud)
-          print(f"Applied {changes} scoped runtime change(s)")
+          updated = payload_pattern.sub(update_payload, loader)
+          if patched == 0:
+              raise SystemExit("No navigation bridge was updated")
+          path.write_text(updated)
+          print(f"Captured state references in {patched} payload(s)")
           PY
-      - name: Commit scoped runtime
+      - name: Commit captured bridge
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add loader.js cloud.js
-          git commit -m "Install scoped access runtime"
+          git add loader.js
+          git commit -m "Capture navigation state references"
           git push
 
-# One-time trigger: payload-scoped access runtime
+# One-time trigger: captured navigation references

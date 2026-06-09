@@ -106,28 +106,9 @@
     <script src="supabase-config.js"></script>
     <script>
       (async function startImoFlow() {
-        const response = await fetch("loader.js?v=4");
+        const response = await fetch("loader.js?v=5");
         if (!response.ok) throw new Error("Não foi possível carregar o ImoFlow.");
-        const nativeAddEventListener = EventTarget.prototype.addEventListener;
-        const navigationClickHandlers = [];
-        EventTarget.prototype.addEventListener = function(type, listener, options) {
-          if (this?.id === "navList" && type === "click") {
-            navigationClickHandlers.push({ listener, options });
-            return;
-          }
-          return nativeAddEventListener.call(this, type, listener, options);
-        };
-        try {
-          await (0, eval)(await response.text());
-          await new Promise(resolve => window.setTimeout(resolve, 1500));
-        } finally {
-          EventTarget.prototype.addEventListener = nativeAddEventListener;
-        }
-        const navigation = document.getElementById("navList");
-        const navigationHandler = navigationClickHandlers.at(-1);
-        if (navigation && navigationHandler) {
-          nativeAddEventListener.call(navigation, "click", navigationHandler.listener, navigationHandler.options);
-        }
+        await (0, eval)(await response.text());
         window.els = {
           pageTitle: document.getElementById("pageTitle"),
           mainContent: document.getElementById("mainContent"),
@@ -145,6 +126,6 @@
           '<div class="empty-state">Não foi possível iniciar o ImoFlow neste navegador.</div>';
       });
     </script>
-    <script src="access-nav-fix.js?v=6"></script>
+    <script src="access-nav-fix.js?v=7"></script>
   </body>
 </html>

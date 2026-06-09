@@ -1,4 +1,4 @@
-name: Patch loader navigation bridge
+name: Rebuild persistent ImoFlow runtime
 
 on:
   push:
@@ -9,29 +9,54 @@ permissions:
   contents: write
 
 jobs:
-  patch-loader:
+  rebuild:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Load synchronized navigation runtime
+      - name: Rebuild application runtime
         run: |
           python - <<'PY'
           from pathlib import Path
+          import base64,gzip,re
 
-          path = Path("loader.js")
-          loader = path.read_text()
-          old = 'cloud-navigation.js?v=6'
-          new = 'cloud-navigation.js?v=7'
-          if old not in loader:
-              raise SystemExit("Navigation runtime version was already updated")
-          path.write_text(loader.replace(old, new, 1))
+          def between(t,a,b,r):
+              i=t.index(a);j=t.index(b,i);return t[:i]+r+t[j:]
+
+          cp=Path('cloud.js');c=cp.read_text()
+          c=c.replace('cloudSubscription=null,cloudSessionStartedFor=','cloudSubscription=null,cloudPollTimer=null,cloudSessionStartedFor=',1)
+          c=c.replace('.user-greeting{margin-bottom:18px;padding:18px 20px;','.user-greeting{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:18px;padding:18px 20px;',1)
+          c=c.replace('.user-role-label{font-size:12px;font-weight:700;color:#0b3b75}', '.user-role-label{font-size:12px;font-weight:700;color:#0b3b75}.profile-summary{grid-column:1/-1;display:grid;gap:4px;padding:14px;border:1px solid #d7deea;background:#f5f7fb}.profile-summary strong{font-size:16px}.profile-summary span{color:#687286;font-size:13px}',1)
+          c=c.replace('@media(max-width:850px){.user-row','@media(max-width:850px){.user-greeting{align-items:flex-start;flex-direction:column}.user-row',1)
+          profile='''  function cloudOpenPasswordForm(){cloudEnsureUserModal();const m=document.getElementById("userAccessModal"),f=m.querySelector("#userAccessForm");m.querySelector("#userAccessEyebrow").textContent="Conta pessoal";m.querySelector("#userAccessTitle").textContent="Perfil";f.innerHTML=`<div class="profile-summary"><strong>${cloudEscape(cloudFullName())}</strong><span>${cloudEscape(cloudProfile?.email||cloudUser?.email||"")}</span><span>${cloudEscape(cloudProfile?.company_function||"Função não indicada")}</span></div><label class="full">Nova palavra-passe<input name="password" type="password" minlength="8" required></label><label class="full">Confirmar palavra-passe<input name="passwordConfirm" type="password" minlength="8" required></label><footer><button class="secondary-button" data-close-user-access type="button">Cancelar</button><button class="primary-button" type="submit">Alterar palavra-passe</button></footer>`;f.addEventListener("submit",async e=>{e.preventDefault();if(f.password.value!==f.passwordConfirm.value)return toast("As palavras-passe não coincidem.");const{error}=await cloudClient.auth.updateUser({password:f.password.value});if(error)return toast("Não foi possível alterar a palavra-passe.");cloudCloseUserModal();toast("Palavra-passe alterada.")});m.classList.add("is-open")}
+'''
+          c=between(c,'  function cloudOpenPasswordForm(){','  async function cloudCreateUser',profile)
+          greeting='''  function cloudDecorateCurrentView(){const existing=document.querySelector(".user-greeting");if(document.body.classList.contains("cloud-users-view")||state.view!=="dashboard"||!cloudProfile){existing?.remove();return}if(existing)return;document.getElementById("mainContent")?.insertAdjacentHTML("afterbegin",`<section class="user-greeting"><div><h2>${cloudGreeting()}, ${cloudEscape(cloudProfile.first_name||cloudFullName())}</h2><p>${cloudEscape(cloudProfile.company_function||"Função não indicada")}</p></div><button class="secondary-button" id="profileBtn" type="button">Perfil</button></section>`);document.getElementById("profileBtn")?.addEventListener("click",cloudOpenPasswordForm)}
+'''
+          c=between(c,'  function cloudDecorateCurrentView(){','  function cloudObserveViews',greeting)
+          signed='''  function cloudSetSignedInInterface(){document.getElementById("authGate")?.classList.add("is-hidden");document.querySelector(".app-shell")?.classList.remove("is-auth-locked");const footer=document.querySelector(".sidebar-footer");if(footer)footer.innerHTML=`<span class="status-dot"></span><span>Dados online</span>`;if(document.getElementById("accountControls"))return;const x=document.createElement("div");x.id="accountControls";x.className="account-controls";x.innerHTML=`<span class="sync-indicator" id="syncIndicator">Sincronizado</span><button class="ghost-button" id="signOutBtn" type="button">Sair</button>`;document.querySelector(".topbar-actions")?.append(x);x.querySelector("#signOutBtn").addEventListener("click",async()=>{await cloudClient.auth.signOut();window.location.reload()})}
+'''
+          c=between(c,'  function cloudSetSignedInInterface(){','  function cloudSetSync',signed)
+          c=c.replace('cloudSubscribe();render();cloudSetSync("Sincronizado")','cloudSubscribe();cloudStartPolling();render();cloudSetSync("Sincronizado")',1)
+          poll='''  async function cloudPollRemoteState(){if(!cloudClient||!cloudUser||cloudWriteInFlight)return;const{data:r,error}=await cloudClient.from("crm_state").select("data, quick_todos, updated_at").eq("id",CLOUD_STATE_ID).maybeSingle();if(error||!r?.data||r.updated_at===cloudLastUpdatedAt)return;cloudLastUpdatedAt=r.updated_at||"";state.data=normalizeData(r.data);state.quickTodos=cloudNormalizeTodos(r.quick_todos||[]);localStorage.setItem(STORAGE_KEY,JSON.stringify(state.data));localStorage.setItem(QUICK_TODOS_KEY,JSON.stringify(state.quickTodos));render();cloudSetSync("Sincronizado")}
+  function cloudStartPolling(){if(cloudPollTimer)return;cloudPollTimer=window.setInterval(cloudPollRemoteState,3000)}
+'''
+          c=c.replace('  saveData=function()',poll+'  saveData=function()',1);cp.write_text(c)
+
+          lp=Path('loader.js');l=lp.read_text();pat=re.compile(r'(?P<i>\s*)(?:\(0, eval\)|eval)\(await imoflowInflate\("(?P<d>[A-Za-z0-9+/=]+)"\)\);');apps=[]
+          for m in pat.finditer(l):
+              s=gzip.decompress(base64.b64decode(m.group('d'))).decode()
+              if 'function renderContacts()' in s and 'function setView(view)' in s:apps.append((m,s))
+          if not apps:raise SystemExit('Application payload not found')
+          chosen=next((x for x in apps if 'window.imoflowBaseSetView' in x[1]),apps[0]);app=chosen[1].replace('\ninitializeApp();\n','\n')
+          ce=c.replace('  if (typeof configureRemoteClient === "function") return;\n','',1);nav=Path('cloud-navigation.js').read_text();src='(() => {\n'+app+'\n/* IMOFLOW_CLOUD_EMBED_START */\n'+ce+'\n'+nav+'\n})();';enc=base64.b64encode(gzip.compress(src.encode(),mtime=0)).decode();replacement='\n  eval(await imoflowInflate("'+enc+'"));';first=min(m.start() for m,_ in apps)
+          for m,_ in sorted(apps,key=lambda x:x[0].start(),reverse=True):l=l[:m.start()]+(replacement if m.start()==first else '')+l[m.end():]
+          l=re.sub(r'\s*eval\(await \(await fetch\("cloud\.js\?v=\d+"\)\)\.text\(\)\);','',l);l=re.sub(r'\s*eval\(await \(await fetch\("cloud-navigation\.js\?v=\d+"\)\)\.text\(\)\);','',l);lp.write_text(l)
+          ip=Path('index.html');i=ip.read_text();i=i if 'src="locations-portugal.js"' in i else i.replace('    <script src="supabase-config.js"></script>','    <script src="supabase-config.js"></script>\n    <script src="locations-portugal.js"></script>',1);i=re.sub(r'loader\.js\?v=\d+','loader.js?v=12',i,count=1);ip.write_text(i)
           PY
-      - name: Commit runtime version
+      - name: Commit rebuilt runtime
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add loader.js
-          git commit -m "Load synchronized navigation runtime"
+          git add cloud.js loader.js index.html
+          git commit -m "Fix persistent UI state and profile"
           git push
-
-# One-time trigger: synchronized navigation runtime

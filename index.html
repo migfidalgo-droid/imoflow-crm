@@ -111,14 +111,9 @@
         const nativeAddEventListener = EventTarget.prototype.addEventListener;
         const navigationHandlers = [];
         let navigationReleased = false;
-        EventTarget.prototype.addEventListener = function(type, listener, options) {
-          if (!navigationReleased && this === navigation && type === "click") {
-            navigationHandlers.push({ listener, options });
-            return;
-          }
-          return nativeAddEventListener.call(this, type, listener, options);
-        };
-        window.setTimeout(() => {
+        let navigationReleaseTimer = null;
+        const releaseNavigation = () => {
+          if (navigationReleased) return;
           navigationReleased = true;
           EventTarget.prototype.addEventListener = nativeAddEventListener;
           const effectiveHandler = navigationHandlers.at(-1);
@@ -126,7 +121,17 @@
             nativeAddEventListener.call(navigation, "click", effectiveHandler.listener, effectiveHandler.options);
           }
           window.IMOFLOW_NAV_HANDLER_COUNT = navigationHandlers.length;
-        }, 4000);
+        };
+        EventTarget.prototype.addEventListener = function(type, listener, options) {
+          if (!navigationReleased && this === navigation && type === "click") {
+            navigationHandlers.push({ listener, options });
+            window.clearTimeout(navigationReleaseTimer);
+            navigationReleaseTimer = window.setTimeout(releaseNavigation, 1500);
+            return;
+          }
+          return nativeAddEventListener.call(this, type, listener, options);
+        };
+        window.setTimeout(releaseNavigation, 20000);
 
         const response = await fetch("loader.js?v=5");
         if (!response.ok) throw new Error("Não foi possível carregar o ImoFlow.");

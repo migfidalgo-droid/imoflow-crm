@@ -1,0 +1,52 @@
+name: Patch loader navigation bridge
+
+on:
+  push:
+    paths:
+      - .github/workflows/patch-loader-navigation.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch-loader:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Expose the internal navigation controller
+        run: |
+          python - <<'PY'
+          import base64
+          import gzip
+          import re
+          from pathlib import Path
+
+          path = Path("loader.js")
+          loader = path.read_text()
+          payload_pattern = re.compile(r'(?P<prefix>\(0, eval\)\(await imoflowInflate\(")(?P<data>[^"]+)(?P<suffix>"\)\);)')
+          set_view_pattern = re.compile(r'(function setView\(view\) \{\s*state\.view = view;\s*render\(\);\s*\})')
+          patched = 0
+
+          def update_payload(match):
+              global patched
+              source = gzip.decompress(base64.b64decode(match.group("data"))).decode("utf-8")
+              if "window.imoflowBaseSetView = setView;" in source or not set_view_pattern.search(source):
+                  return match.group(0)
+              source = set_view_pattern.sub(r'\1\n\nwindow.imoflowBaseSetView = setView;', source, count=1)
+              payload = base64.b64encode(gzip.compress(source.encode("utf-8"), mtime=0)).decode("ascii")
+              patched += 1
+              return match.group("prefix") + payload + match.group("suffix")
+
+          updated = payload_pattern.sub(update_payload, loader)
+          if patched == 0:
+              raise SystemExit("No application navigation payload was patched")
+          path.write_text(updated)
+          print(f"Patched {patched} application payload(s)")
+          PY
+      - name: Commit patched loader
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add loader.js
+          git commit -m "Expose internal navigation controller"
+          git push

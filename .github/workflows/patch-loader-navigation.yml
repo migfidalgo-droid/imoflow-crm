@@ -31,7 +31,7 @@ jobs:
 
           runtime = '  eval(await (await fetch("cloud.js?v=12")).text());\n  eval(await (await fetch("cloud-navigation.js?v=6")).text());\n'
           if runtime not in loader:
-              closing = '\n})();'
+              closing = '})();'
               position = loader.rfind(closing)
               if position < 0:
                   raise SystemExit("Could not locate loader runtime closing")
@@ -49,7 +49,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add loader.js cloud.js
-          git commit -m "Load access control inside application scope"
+          git commit -m "Install scoped access runtime"
           git push
 
-# One-time trigger: scoped access runtime
+# One-time trigger: compact scoped runtime

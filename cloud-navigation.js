@@ -18,12 +18,17 @@
       try {
         let opened = false;
         if (typeof window.imoflowBaseSetView === "function") {
+          navigation.dataset.lastNavigationSource = "baseSetView";
           window.imoflowBaseSetView(button.dataset.view);
           opened = true;
         } else if (typeof window.imoflowBaseNavigate === "function") {
+          navigation.dataset.lastNavigationSource = "baseNavigate";
           opened = window.imoflowBaseNavigate(button.dataset.view);
         }
-        if (!opened) window.imoflowSetView(button.dataset.view);
+        if (!opened) {
+          navigation.dataset.lastNavigationSource = "bridge";
+          window.imoflowSetView(button.dataset.view);
+        }
         navigation.dataset.lastNavigationResult = opened ? "base" : "bridge";
       } catch (error) {
         navigation.dataset.lastNavigationResult = error?.message || "error";

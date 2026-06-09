@@ -105,35 +105,29 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script>
-      (() => {
-        window.IMOFLOW_NAV_FIX_VERSION = "9";
+      (async function startImoFlow() {
+        window.IMOFLOW_NAV_FIX_VERSION = "10";
         const navigation = document.getElementById("navList");
-        if (!navigation) return;
         const nativeAddEventListener = EventTarget.prototype.addEventListener;
         const navigationHandlers = [];
-        let released = false;
-
+        let navigationReleased = false;
         EventTarget.prototype.addEventListener = function(type, listener, options) {
-          if (!released && this === navigation && type === "click") {
+          if (!navigationReleased && this === navigation && type === "click") {
             navigationHandlers.push({ listener, options });
             return;
           }
           return nativeAddEventListener.call(this, type, listener, options);
         };
-
         window.setTimeout(() => {
-          released = true;
+          navigationReleased = true;
           EventTarget.prototype.addEventListener = nativeAddEventListener;
           const effectiveHandler = navigationHandlers.at(-1);
-          if (effectiveHandler) {
+          if (navigation && effectiveHandler) {
             nativeAddEventListener.call(navigation, "click", effectiveHandler.listener, effectiveHandler.options);
           }
           window.IMOFLOW_NAV_HANDLER_COUNT = navigationHandlers.length;
         }, 4000);
-      })();
-    </script>
-    <script>
-      (async function startImoFlow() {
+
         const response = await fetch("loader.js?v=5");
         if (!response.ok) throw new Error("Não foi possível carregar o ImoFlow.");
         await (0, eval)(await response.text());

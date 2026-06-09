@@ -116,7 +116,7 @@
           if (navigationReleased) return;
           navigationReleased = true;
           EventTarget.prototype.addEventListener = nativeAddEventListener;
-          const effectiveHandler = navigationHandlers.at(-1);
+          const effectiveHandler = navigationHandlers[0];
           if (navigation && effectiveHandler) {
             nativeAddEventListener.call(navigation, "click", effectiveHandler.listener, effectiveHandler.options);
           }

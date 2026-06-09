@@ -1,4 +1,5 @@
 (() => {
+  window.IMOFLOW_NAV_FIX_VERSION = "6";
   const navigation = document.getElementById("navList");
   if (!navigation) return;
   const pendingViewKey = "imoflowView";

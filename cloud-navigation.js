@@ -16,8 +16,13 @@
       event.stopImmediatePropagation();
       navigation.dataset.lastRequestedView = button.dataset.view;
       try {
-        const opened = typeof window.imoflowBaseNavigate === "function"
-          && window.imoflowBaseNavigate(button.dataset.view);
+        let opened = false;
+        if (typeof window.imoflowBaseSetView === "function") {
+          window.imoflowBaseSetView(button.dataset.view);
+          opened = true;
+        } else if (typeof window.imoflowBaseNavigate === "function") {
+          opened = window.imoflowBaseNavigate(button.dataset.view);
+        }
         if (!opened) window.imoflowSetView(button.dataset.view);
         navigation.dataset.lastNavigationResult = opened ? "base" : "bridge";
       } catch (error) {

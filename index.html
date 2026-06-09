@@ -106,6 +106,32 @@
     <script src="supabase-config.js"></script>
     <script>
       (async function startImoFlow() {
+        const navigation = document.getElementById("navList");
+        const nativeAddEventListener = EventTarget.prototype.addEventListener;
+        const baseNavigationHandlers = [];
+        window.imoflowNativeAddNavigation = nativeAddEventListener;
+        EventTarget.prototype.addEventListener = function(type, listener, options) {
+          if (this === navigation && type === "click") {
+            baseNavigationHandlers.push({ listener, options });
+            return;
+          }
+          return nativeAddEventListener.call(this, type, listener, options);
+        };
+        window.imoflowBaseNavigate = view => {
+          const button = navigation?.querySelector(`[data-view="${view}"]`);
+          if (!button) return false;
+          for (const handler of baseNavigationHandlers) {
+            try {
+              handler.listener.call(navigation, { target: button });
+            } catch {
+              continue;
+            }
+            const activeView = navigation.querySelector(".nav-item.is-active")?.dataset.view;
+            if (activeView === view) return true;
+          }
+          return false;
+        };
+
         const response = await fetch("loader.js?v=5");
         if (!response.ok) throw new Error("Não foi possível carregar o ImoFlow.");
         await (0, eval)(await response.text());
@@ -121,7 +147,7 @@
         cloudScript.src = "cloud.js?v=11";
         document.body.appendChild(cloudScript);
         const navigationScript = document.createElement("script");
-        navigationScript.src = "cloud-navigation.js?v=2";
+        navigationScript.src = "cloud-navigation.js?v=3";
         document.body.appendChild(navigationScript);
       })().catch(error => {
         console.error(error);

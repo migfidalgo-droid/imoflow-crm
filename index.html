@@ -105,30 +105,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script>
-      (async function startImoFlow() {
-        const response = await fetch("loader.js?v=5");
-        if (!response.ok) throw new Error("Não foi possível carregar o ImoFlow.");
-        await (0, eval)(await response.text());
-        window.els = {
-          pageTitle: document.getElementById("pageTitle"),
-          mainContent: document.getElementById("mainContent"),
-          globalSearch: document.getElementById("globalSearch"),
-          quickAddBtn: document.getElementById("quickAddBtn"),
-          exportDataBtn: document.getElementById("exportDataBtn"),
-          importDataBtn: document.getElementById("importDataBtn"),
-        };
-        const cloudScript = document.createElement("script");
-        cloudScript.src = "cloud.js?v=11";
-        document.body.appendChild(cloudScript);
-      })().catch(error => {
-        console.error(error);
-        document.getElementById("mainContent").innerHTML =
-          '<div class="empty-state">Não foi possível iniciar o ImoFlow neste navegador.</div>';
-      });
-    </script>
-    <script>
       (() => {
-        window.IMOFLOW_NAV_FIX_VERSION = "8";
+        window.IMOFLOW_NAV_FIX_VERSION = "9";
         const navigation = document.getElementById("navList");
         if (!navigation) return;
         const nativeAddEventListener = EventTarget.prototype.addEventListener;
@@ -153,6 +131,28 @@
           window.IMOFLOW_NAV_HANDLER_COUNT = navigationHandlers.length;
         }, 4000);
       })();
+    </script>
+    <script>
+      (async function startImoFlow() {
+        const response = await fetch("loader.js?v=5");
+        if (!response.ok) throw new Error("Não foi possível carregar o ImoFlow.");
+        await (0, eval)(await response.text());
+        window.els = {
+          pageTitle: document.getElementById("pageTitle"),
+          mainContent: document.getElementById("mainContent"),
+          globalSearch: document.getElementById("globalSearch"),
+          quickAddBtn: document.getElementById("quickAddBtn"),
+          exportDataBtn: document.getElementById("exportDataBtn"),
+          importDataBtn: document.getElementById("importDataBtn"),
+        };
+        const cloudScript = document.createElement("script");
+        cloudScript.src = "cloud.js?v=11";
+        document.body.appendChild(cloudScript);
+      })().catch(error => {
+        console.error(error);
+        document.getElementById("mainContent").innerHTML =
+          '<div class="empty-state">Não foi possível iniciar o ImoFlow neste navegador.</div>';
+      });
     </script>
   </body>
 </html>

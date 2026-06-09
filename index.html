@@ -106,33 +106,6 @@
     <script src="supabase-config.js"></script>
     <script>
       (async function startImoFlow() {
-        window.IMOFLOW_NAV_FIX_VERSION = "10";
-        const navigation = document.getElementById("navList");
-        const nativeAddEventListener = EventTarget.prototype.addEventListener;
-        const navigationHandlers = [];
-        let navigationReleased = false;
-        let navigationReleaseTimer = null;
-        const releaseNavigation = () => {
-          if (navigationReleased) return;
-          navigationReleased = true;
-          EventTarget.prototype.addEventListener = nativeAddEventListener;
-          const effectiveHandler = navigationHandlers[0];
-          if (navigation && effectiveHandler) {
-            nativeAddEventListener.call(navigation, "click", effectiveHandler.listener, effectiveHandler.options);
-          }
-          window.IMOFLOW_NAV_HANDLER_COUNT = navigationHandlers.length;
-        };
-        EventTarget.prototype.addEventListener = function(type, listener, options) {
-          if (!navigationReleased && this === navigation && type === "click") {
-            navigationHandlers.push({ listener, options });
-            window.clearTimeout(navigationReleaseTimer);
-            navigationReleaseTimer = window.setTimeout(releaseNavigation, 1500);
-            return;
-          }
-          return nativeAddEventListener.call(this, type, listener, options);
-        };
-        window.setTimeout(releaseNavigation, 20000);
-
         const response = await fetch("loader.js?v=5");
         if (!response.ok) throw new Error("Não foi possível carregar o ImoFlow.");
         await (0, eval)(await response.text());
@@ -147,6 +120,9 @@
         const cloudScript = document.createElement("script");
         cloudScript.src = "cloud.js?v=11";
         document.body.appendChild(cloudScript);
+        const navigationScript = document.createElement("script");
+        navigationScript.src = "cloud-navigation.js?v=1";
+        document.body.appendChild(navigationScript);
       })().catch(error => {
         console.error(error);
         document.getElementById("mainContent").innerHTML =

@@ -119,6 +119,7 @@
         };
         try {
           await (0, eval)(await response.text());
+          await new Promise(resolve => window.setTimeout(resolve, 1500));
         } finally {
           EventTarget.prototype.addEventListener = nativeAddEventListener;
         }

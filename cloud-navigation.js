@@ -17,6 +17,15 @@
       navigation.dataset.lastRequestedView = button.dataset.view;
       try {
         let opened = false;
+        let bridgeOpened = false;
+        if (typeof window.imoflowSetView === "function") {
+          try {
+            window.imoflowSetView(button.dataset.view);
+            bridgeOpened = true;
+          } catch (error) {
+            navigation.dataset.lastBridgeError = error?.message || "error";
+          }
+        }
         if (typeof window.imoflowBaseSetView === "function") {
           navigation.dataset.lastNavigationSource = "baseSetView";
           window.imoflowBaseSetView(button.dataset.view);
@@ -27,9 +36,9 @@
         }
         if (!opened) {
           navigation.dataset.lastNavigationSource = "bridge";
-          window.imoflowSetView(button.dataset.view);
+          if (!bridgeOpened) window.imoflowSetView(button.dataset.view);
         }
-        navigation.dataset.lastNavigationResult = opened ? "base" : "bridge";
+        navigation.dataset.lastNavigationResult = opened && bridgeOpened ? "base+bridge" : opened ? "base" : "bridge";
       } catch (error) {
         navigation.dataset.lastNavigationResult = error?.message || "error";
       }

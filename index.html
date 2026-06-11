@@ -133,7 +133,7 @@
           return false;
         };
 
-        const response = await fetch("loader.js?v=18");
+        const response = await fetch("loader.js?v=19");
         if (!response.ok) throw new Error("Não foi possível carregar o ImoFlow.");
         await (0, eval)(await response.text());
         window.els = {

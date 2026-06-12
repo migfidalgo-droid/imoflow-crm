@@ -1,4 +1,4 @@
-name: Deploy ImoFlow v22
+name: Deploy ImoFlow v23
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Apply ImoFlow v22 runtime patch
+      - name: Apply ImoFlow v23 runtime patch
         run: |
           cat .github/imoflow-runtime-patch-0.b64 .github/imoflow-runtime-patch-1.b64 | base64 -d | gzip -dc > /tmp/runtime.patch
           node <<'NODE'
@@ -37,7 +37,7 @@ jobs:
             return position === 2 ? `eval(await imoflowInflate("${payload}"));` : full;
           });
           fs.writeFileSync('loader.js', loader);
-          const index = fs.readFileSync('index.html', 'utf8').replace(/loader\.js\?v=\d+/, 'loader.js?v=22');
+          const index = fs.readFileSync('index.html', 'utf8').replace(/loader\.js\?v=\d+/, 'loader.js?v=23');
           fs.writeFileSync('index.html', index);
           NODE
       - name: Commit deployment
@@ -45,5 +45,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add loader.js index.html
-          git diff --cached --quiet || git commit -m 'Deploy ImoFlow v22 professional client portal'
+          git diff --cached --quiet || git commit -m 'Deploy ImoFlow v23 polished client portal'
           git push

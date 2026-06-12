@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CRM Imobiliário V1</title>
+    <link rel="stylesheet" href="email-center-v26.css?v=26">
   </head>
   <body>
     <div class="app-shell">
@@ -133,9 +134,11 @@
           return false;
         };
 
-        const response = await fetch("loader.js?v=25");
+        const response = await fetch("loader.js?v=26");
         if (!response.ok) throw new Error("Não foi possível carregar o ImoFlow.");
         await (0, eval)(await response.text());
+        const emailCenterResponse = await fetch("email-center-v26-loader.js?v=26");
+        if (emailCenterResponse.ok) await (0, eval)(await emailCenterResponse.text());
         window.els = {
           pageTitle: document.getElementById("pageTitle"),
           mainContent: document.getElementById("mainContent"),

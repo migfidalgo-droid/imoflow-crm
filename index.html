@@ -4,19 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CRM Imobiliário V1</title>
-    <link rel="stylesheet" href="email-center-v26.css?v=26">
+    <link rel="stylesheet" href="email-center-v26.css?v=27">
   </head>
   <body>
     <div class="app-shell">
       <aside class="sidebar" aria-label="Navegação principal">
         <div class="brand">
           <img class="brand-agency-logo" alt="RE/MAX Power Benavente">
-          <div class="brand-product">
-            <strong>ImoFlow</strong>
-            <span>CRM Imobiliária</span>
-          </div>
+          <div class="brand-product"><strong>ImoFlow</strong><span>CRM Imobiliária</span></div>
         </div>
-
         <nav class="nav-list" id="navList">
           <button class="nav-item is-active" data-view="dashboard" type="button">Painel principal</button>
           <button class="nav-item" data-view="contacts" type="button">Contactos</button>
@@ -28,81 +24,37 @@
           <button class="nav-item" data-view="reports" type="button">Relatórios</button>
           <button class="nav-item" data-view="portal" type="button">Portal cliente</button>
         </nav>
-
-        <div class="sidebar-footer">
-          <span class="status-dot"></span>
-          <span>Dados locais</span>
-        </div>
+        <div class="sidebar-footer"><span class="status-dot"></span><span>Dados locais</span></div>
       </aside>
-
       <main class="main">
         <header class="topbar">
-          <div>
-            <p class="eyebrow">Fase 1</p>
-            <h1 id="pageTitle">Painel</h1>
-          </div>
+          <div><p class="eyebrow">Fase 1</p><h1 id="pageTitle">Painel</h1></div>
           <div class="topbar-actions">
-            <label class="search-field" for="globalSearch">
-              <span>Pesquisar</span>
-              <input id="globalSearch" type="search" placeholder="Nome, telefone, referência...">
-            </label>
-            <button class="icon-button" id="exportDataBtn" type="button" title="Exportar dados" aria-label="Exportar dados">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 3v12"></path>
-                <path d="m7 10 5 5 5-5"></path>
-                <path d="M5 21h14"></path>
-              </svg>
-            </button>
-            <button class="icon-button" id="importDataBtn" type="button" title="Importar dados" aria-label="Importar dados">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 21V9"></path>
-                <path d="m7 14 5-5 5 5"></path>
-                <path d="M5 3h14"></path>
-              </svg>
-            </button>
+            <label class="search-field" for="globalSearch"><span>Pesquisar</span><input id="globalSearch" type="search" placeholder="Nome, telefone, referência..."></label>
+            <button class="icon-button" id="exportDataBtn" type="button" title="Exportar dados" aria-label="Exportar dados"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path></svg></button>
+            <button class="icon-button" id="importDataBtn" type="button" title="Importar dados" aria-label="Importar dados"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21V9"></path><path d="m7 14 5-5 5 5"></path><path d="M5 3h14"></path></svg></button>
             <button class="primary-button" id="quickAddBtn" type="button">Novo</button>
             <input id="importFileInput" type="file" accept="application/json" hidden>
           </div>
         </header>
-
         <section class="content" id="mainContent" aria-live="polite"></section>
       </main>
     </div>
-
     <div class="modal" id="entityModal" aria-hidden="true">
       <div class="modal-backdrop" data-close-modal></div>
       <section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-        <header class="modal-header">
-          <div>
-            <p class="eyebrow" id="modalEyebrow">Registo</p>
-            <h2 id="modalTitle">Novo registo</h2>
-          </div>
-          <button class="icon-button" data-close-modal type="button" aria-label="Fechar">x</button>
-        </header>
+        <header class="modal-header"><div><p class="eyebrow" id="modalEyebrow">Registo</p><h2 id="modalTitle">Novo registo</h2></div><button class="icon-button" data-close-modal type="button" aria-label="Fechar">x</button></header>
         <form id="entityForm" class="form-grid"></form>
       </section>
     </div>
-
     <div class="document-viewer" id="documentViewer" aria-hidden="true">
       <div class="document-viewer-backdrop" data-close-document-viewer></div>
       <section class="document-viewer-panel" role="dialog" aria-modal="true" aria-labelledby="documentViewerTitle">
-        <header class="document-viewer-header">
-          <div>
-            <p class="eyebrow">Documento</p>
-            <h2 id="documentViewerTitle">Visualizar documento</h2>
-          </div>
-          <div class="document-viewer-actions">
-            <a class="secondary-button" id="documentViewerOpen" href="#" target="_blank" rel="noopener">Abrir em nova janela</a>
-            <a class="secondary-button" id="documentViewerDownload" href="#" download>Descarregar</a>
-            <button class="icon-button" data-close-document-viewer type="button" aria-label="Fechar">x</button>
-          </div>
-        </header>
+        <header class="document-viewer-header"><div><p class="eyebrow">Documento</p><h2 id="documentViewerTitle">Visualizar documento</h2></div><div class="document-viewer-actions"><a class="secondary-button" id="documentViewerOpen" href="#" target="_blank" rel="noopener">Abrir em nova janela</a><a class="secondary-button" id="documentViewerDownload" href="#" download>Descarregar</a><button class="icon-button" data-close-document-viewer type="button" aria-label="Fechar">x</button></div></header>
         <div class="document-viewer-body" id="documentViewerBody"></div>
       </section>
     </div>
-
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="locations-portugal.js"></script>
@@ -113,45 +65,26 @@
         const baseNavigationHandlers = [];
         window.imoflowNativeAddNavigation = nativeAddEventListener;
         EventTarget.prototype.addEventListener = function(type, listener, options) {
-          if (this === navigation && type === "click") {
-            baseNavigationHandlers.push({ listener, options });
-            return;
-          }
+          if (this === navigation && type === "click") { baseNavigationHandlers.push({ listener, options }); return; }
           return nativeAddEventListener.call(this, type, listener, options);
         };
         window.imoflowBaseNavigate = view => {
           const button = navigation?.querySelector(`[data-view="${view}"]`);
           if (!button) return false;
           for (const handler of baseNavigationHandlers) {
-            try {
-              handler.listener.call(navigation, { target: button });
-            } catch {
-              continue;
-            }
+            try { handler.listener.call(navigation, { target: button }); } catch { continue; }
             const activeView = navigation.querySelector(".nav-item.is-active")?.dataset.view;
             if (activeView === view) return true;
           }
           return false;
         };
-
         const response = await fetch("loader.js?v=26");
         if (!response.ok) throw new Error("Não foi possível carregar o ImoFlow.");
         await (0, eval)(await response.text());
-        const emailCenterResponse = await fetch("email-center-v26-loader.js?v=26");
+        const emailCenterResponse = await fetch("email-center-preview-v27-loader.js?v=27");
         if (emailCenterResponse.ok) await (0, eval)(await emailCenterResponse.text());
-        window.els = {
-          pageTitle: document.getElementById("pageTitle"),
-          mainContent: document.getElementById("mainContent"),
-          globalSearch: document.getElementById("globalSearch"),
-          quickAddBtn: document.getElementById("quickAddBtn"),
-          exportDataBtn: document.getElementById("exportDataBtn"),
-          importDataBtn: document.getElementById("importDataBtn"),
-        };
-      })().catch(error => {
-        console.error(error);
-        document.getElementById("mainContent").innerHTML =
-          '<div class="empty-state">Não foi possível iniciar o ImoFlow neste navegador.</div>';
-      });
+        window.els = { pageTitle: document.getElementById("pageTitle"), mainContent: document.getElementById("mainContent"), globalSearch: document.getElementById("globalSearch"), quickAddBtn: document.getElementById("quickAddBtn"), exportDataBtn: document.getElementById("exportDataBtn"), importDataBtn: document.getElementById("importDataBtn") };
+      })().catch(error => { console.error(error); document.getElementById("mainContent").innerHTML = '<div class="empty-state">Não foi possível iniciar o ImoFlow neste navegador.</div>'; });
     </script>
   </body>
 </html>

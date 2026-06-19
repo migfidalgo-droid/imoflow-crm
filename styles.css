@@ -814,19 +814,20 @@ h3 {
 
 .quick-todo-list {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 8px;
 }
 
 .quick-todo-item {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 10px;
-  align-items: center;
-  min-height: 42px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  align-content: space-between;
+  min-height: 88px;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   background: #fafbfc;
-  padding: 8px 10px;
+  padding: 10px;
 }
 
 .quick-todo-check {
@@ -854,8 +855,16 @@ h3 {
 }
 
 .quick-todo-delete {
+  justify-self: start;
   min-height: 30px;
   padding: 5px 8px;
+}
+
+.print-toolstrip {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #f4f7fb;
 }
 
 .business-volume-grid {
@@ -1068,6 +1077,95 @@ img.property-thumb {
 
 .muted {
   color: var(--muted);
+}
+
+.input-with-symbol {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #fff;
+}
+
+.input-with-symbol:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(11, 59, 117, 0.1);
+}
+
+.input-with-symbol input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+}
+
+.input-with-symbol input:focus {
+  outline: 0;
+}
+
+.input-with-symbol span {
+  padding: 0 12px;
+  color: var(--accent-strong);
+  font-weight: 800;
+}
+
+.owner-selector-list,
+.multi-option-list {
+  display: grid;
+  gap: 8px;
+}
+
+.owner-selector-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 180px) minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #fafbfc;
+}
+
+.owner-selector-row label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.owner-add-button {
+  justify-self: start;
+  margin-top: 4px;
+}
+
+.multi-option-list {
+  max-height: 220px;
+  overflow: auto;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #fafbfc;
+}
+
+.multi-option-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.multi-option-item:hover {
+  background: #eef3fb;
+}
+
+.qualification-manager {
+  margin-top: 6px;
+}
+
+.compact-card {
+  gap: 8px;
 }
 
 .stack {

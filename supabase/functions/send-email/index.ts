@@ -102,7 +102,7 @@ function wrapEmailHtml(innerHtml: string) {
           <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="width:640px;max-width:94%;background:#ffffff;border:1px solid #d9e2ec;">
             <tr>
               <td style="background:#082b57;padding:18px 22px;color:#ffffff;">
-                <img src="https://imoflow.pt/assets/remax-power-logo-white.png" alt="RE/MAX Power Benavente" style="height:54px;max-width:210px;object-fit:contain;display:block;">
+                <img src="https://imoflow.pt/assets/remax-power-logo-white.png?v=20260629" alt="RE/MAX Power Benavente" style="height:54px;max-width:210px;object-fit:contain;display:block;">
               </td>
             </tr>
             <tr>

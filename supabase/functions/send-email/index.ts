@@ -226,7 +226,7 @@ Deno.serve(async (req: Request) => {
   }
 
   const from = envValue("EMAIL_FROM") || "RE/MAX Power - ImoFlow <notificacoes@imoflow.pt>";
-  const replyTo = envValue("EMAIL_REPLY_TO");
+  const replyTo = envValue("EMAIL_REPLY_TO") || "power@remax.pt";
   const innerHtml = html || `<p>${escapeHtml(text).replaceAll("\n", "<br>")}</p>`;
   const resendPayload: Record<string, unknown> = {
     from,

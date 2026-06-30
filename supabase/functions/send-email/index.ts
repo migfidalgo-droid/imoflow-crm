@@ -101,8 +101,18 @@ function wrapEmailHtml(innerHtml: string) {
         <td align="center">
           <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="width:640px;max-width:94%;background:#ffffff;border:1px solid #d9e2ec;">
             <tr>
-              <td style="background:#082b57;padding:18px 22px;color:#ffffff;">
-                <img src="https://imoflow.pt/assets/remax-power-logo-white.png?v=20260629" alt="RE/MAX Power Benavente" style="height:54px;max-width:210px;object-fit:contain;display:block;">
+              <td style="background:#03162d;border-bottom:4px solid #e31b23;padding:18px 22px;color:#ffffff;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td align="left" style="vertical-align:middle;">
+                      <img src="https://imoflow.pt/assets/remax-power-logo-white.png?v=20260629" alt="RE/MAX Power Benavente" style="height:60px;max-width:230px;object-fit:contain;display:block;">
+                    </td>
+                    <td align="right" style="vertical-align:middle;font-family:Arial,sans-serif;color:#ffffff;text-align:right;">
+                      <div style="font-size:16px;font-weight:700;line-height:1.3;">RE/MAX Power - ImoFlow</div>
+                      <div style="margin-top:4px;color:#c7d7e7;font-size:12px;line-height:1.3;">notificacoes@imoflow.pt</div>
+                    </td>
+                  </tr>
+                </table>
               </td>
             </tr>
             <tr>
